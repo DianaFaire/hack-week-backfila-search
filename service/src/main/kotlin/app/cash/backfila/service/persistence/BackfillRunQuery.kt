@@ -5,6 +5,7 @@ import misk.hibernate.Id
 import misk.hibernate.Operator
 import misk.hibernate.Order
 import misk.hibernate.Query
+import java.time.Instant
 
 interface BackfillRunQuery : Query<DbBackfillRun> {
   @Constraint("id")
@@ -27,6 +28,12 @@ interface BackfillRunQuery : Query<DbBackfillRun> {
 
   @Constraint("state", Operator.NE)
   fun stateNot(state: BackfillState): BackfillRunQuery
+
+  @Constraint("created_at", Operator.GE)
+  fun createdAfter(instant: Instant): BackfillRunQuery
+
+  @Constraint("created_at", Operator.LE)
+  fun createdBefore(instant: Instant): BackfillRunQuery
 
   @Order("id", asc = false)
   fun orderByIdDesc(): BackfillRunQuery
