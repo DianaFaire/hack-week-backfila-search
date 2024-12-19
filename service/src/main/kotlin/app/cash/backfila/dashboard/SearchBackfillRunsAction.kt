@@ -13,6 +13,7 @@ import misk.hibernate.Id
 import misk.hibernate.Query
 import misk.hibernate.Session
 import misk.hibernate.Transacter
+import misk.hibernate.constraint
 import misk.hibernate.newQuery
 import misk.hibernate.pagination.Offset
 import misk.hibernate.pagination.Page
@@ -179,7 +180,10 @@ class SearchBackfillRunsAction @Inject constructor(
     return if (backfillName.isNullOrEmpty()) {
       this
     } else {
-      this.backfillName(backfillName)
+      this.constraint { backfillRunRoot ->
+        val registeredBackfillJoin = backfillRunRoot.join<DbBackfillRun, DbRegisteredBackfill>("registered_backfill")
+        like(registeredBackfillJoin.get("name"), "%$backfillName%")
+      }
     }
   }
 
@@ -187,7 +191,9 @@ class SearchBackfillRunsAction @Inject constructor(
     return if (author.isNullOrEmpty()) {
       this
     } else {
-      this.createdByUser(author)
+      this.constraint { backfillRunRoot ->
+        like(backfillRunRoot.get("created_by_user"), "%$author%")
+      }
     }
   }
 
